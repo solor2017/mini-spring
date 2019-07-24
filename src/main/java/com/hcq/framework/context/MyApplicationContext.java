@@ -1,5 +1,6 @@
 package com.hcq.framework.context;
 
+import com.hcq.framework.annotation.MyAutowired;
 import com.hcq.framework.annotation.MyController;
 import com.hcq.framework.annotation.MyService;
 import com.hcq.framework.beans.MyBeanWrapper;
@@ -9,6 +10,7 @@ import com.hcq.framework.beans.support.MyDefaultListableBeanFactory;
 import com.hcq.framework.core.MyBeanFctory;
 import lombok.extern.slf4j.Slf4j;
 
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -129,7 +131,33 @@ public class MyApplicationContext extends MyDefaultListableBeanFactory implement
                 wrappedClass.isAnnotationPresent(MyService.class))) {
             return;
         }
+        //获得所有的fields
+        Field[] fields = wrappedClass.getDeclaredFields();
+        for (Field field : fields) {
+            if(!field.isAnnotationPresent(MyAutowired.class)){ continue;}
 
+            MyAutowired autowired = field.getAnnotation(MyAutowired.class);
+
+            String autowiredBeanName =  autowired.value().trim();
+            if("".equals(autowiredBeanName)){
+                autowiredBeanName = field.getType().getName();
+            }
+
+            //强制访问
+            field.setAccessible(true);
+
+            try {
+                //为什么会为NULL，先留个坑
+                if(this.factoryBeanInstanceCache.get(autowiredBeanName) == null){ continue; }
+//                if(instance == null){
+//                    continue;
+//                }
+                field.set(instanceClass,this.factoryBeanInstanceCache.get(autowiredBeanName).getWrappedInstance());
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+
+        }
 
     }
 
