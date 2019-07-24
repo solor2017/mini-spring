@@ -143,11 +143,9 @@ public class MyApplicationContext extends MyDefaultListableBeanFactory implement
                 autowiredBeanName = field.getType().getName();
             }
 
-            //强制访问
             field.setAccessible(true);
 
             try {
-                //为什么会为NULL，先留个坑
                 if(this.factoryBeanInstanceCache.get(autowiredBeanName) == null){ continue; }
 //                if(instance == null){
 //                    continue;
