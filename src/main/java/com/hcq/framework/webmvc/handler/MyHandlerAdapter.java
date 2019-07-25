@@ -119,9 +119,7 @@ public class MyHandlerAdapter {
             }
             return null;
         }
-        //如果还有double或者其他类型，继续加if
-        //这时候，我们应该想到策略模式了
-        //在这里暂时不实现，希望小伙伴自己来实现
+        //可以考虑策略模式了
 
     }
 
